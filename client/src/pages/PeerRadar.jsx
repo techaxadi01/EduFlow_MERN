@@ -16,6 +16,8 @@ function PeerRadar() {
   const [lng, setLng] = useState(null);
   const [geoStatus, setGeoStatus] = useState({ text: 'Checking Permissions...', color: 'text-amber-500' });
   const [isGpsBound, setIsGpsBound] = useState(false);
+  const [isGpsQuerying, setIsGpsQuerying] = useState(false);
+  const [isGpsError, setIsGpsError] = useState(false);
 
   // Sessions Feed Data
   const [mySessions, setMySessions] = useState([]);
@@ -59,6 +61,8 @@ function PeerRadar() {
 
   // Request GPS Location Telemetry
   const getGPSLocation = () => {
+    setIsGpsQuerying(true);
+    setIsGpsError(false);
     setGeoStatus({ text: 'Querying device hardware...', color: 'text-amber-500 animate-pulse' });
 
     if (navigator.geolocation) {
@@ -69,14 +73,19 @@ function PeerRadar() {
           setLat(latitude);
           setLng(longitude);
           setIsGpsBound(true);
+          setIsGpsQuerying(false);
+          setIsGpsError(false);
           setGeoStatus({ text: `Bound: ${latitude.toFixed(4)}° N, ${longitude.toFixed(4)}° E`, color: 'text-emerald-600 font-bold' });
         },
         () => {
+          setIsGpsQuerying(false);
+          setIsGpsError(true);
           setGeoStatus({ text: 'Access Warning: Permissions blocked.', color: 'text-red-500 font-bold' });
           triggerToast('Location Access Blocked! Enable browser permissions.');
         }
       );
     } else {
+      setIsGpsQuerying(false);
       setGeoStatus({ text: 'Hardware lacking GPS support.', color: 'text-red-500 font-bold' });
     }
   };
@@ -149,11 +158,12 @@ function PeerRadar() {
   };
 
   return (
+    <div className="bg-gradient-to-b from-white via-emerald-50/30 to-slate-50 min-h-screen flex-1 flex flex-col">
     <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-12 flex flex-col gap-10 text-slate-800 font-sans">
       
       {/* Toast Notification */}
       <div
-        className={`fixed bottom-6 left-6 z-50 bg-slate-900 text-emerald-300 font-mono font-semibold text-sm px-5 py-3 rounded-xl shadow-2xl border border-slate-700/50 flex items-center gap-2.5 transition-all duration-300 pointer-events-none ${
+        className={`fixed bottom-6 left-6 z-50 transform bg-slate-900 backdrop-blur-md text-emerald-300 font-mono font-semibold text-sm px-5 py-3 rounded-xl shadow-2xl border border-slate-700/50 flex items-center gap-2.5 transition-all duration-300 pointer-events-none ${
           showToast ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
         }`}
       >
@@ -224,9 +234,29 @@ function PeerRadar() {
               </div>
 
               {/* GPS Telemetry Pill */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-between transition-colors">
+              <div
+                className={`border rounded-xl p-4 flex items-center justify-between transition-colors ${
+                  isGpsError
+                    ? 'bg-red-50/50 border-red-500'
+                    : isGpsBound
+                    ? 'bg-slate-50 border-emerald-500'
+                    : isGpsQuerying
+                    ? 'bg-slate-50 border-amber-500'
+                    : 'bg-slate-50 border-slate-200'
+                }`}
+              >
                 <div className="flex items-center gap-3">
-                  <i className={`fas fa-map-pin text-xl ${isGpsBound ? 'text-emerald-600' : 'text-slate-400'}`}></i>
+                  <i
+                    className={`text-xl ${
+                      isGpsError
+                        ? 'fas fa-triangle-exclamation text-red-500'
+                        : isGpsBound
+                        ? 'fas fa-map-pin text-emerald-600'
+                        : isGpsQuerying
+                        ? 'fas fa-map-pin text-amber-500 animate-bounce'
+                        : 'fas fa-map-pin text-slate-400'
+                    }`}
+                  ></i>
                   <div>
                     <h4 className="font-bold text-slate-700">GPS Location</h4>
                     <p className={`text-[10px] font-mono ${geoStatus.color}`}>{geoStatus.text}</p>
@@ -400,6 +430,7 @@ function PeerRadar() {
         </div>
       </div>
 
+    </div>
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { useState } from 'react';
 import Navbar from './components/Navbar';
 import AuthNavbar from './components/AuthNavbar';
 import Footer from './components/Footer';
@@ -15,7 +14,10 @@ import Dashboard from './pages/Dashboard';
 
 function Layout() {
   const location = useLocation();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Derived directly from localStorage so it stays in sync with login/logout
+  // without needing every page to manually update shared state.
+  const isLoggedIn = !!localStorage.getItem('eduflow_token');
+  const loggedUser = JSON.parse(localStorage.getItem('eduflow_logged_user') || 'null');
 
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
   const isFocusPage = location.pathname === '/focus';
@@ -27,13 +29,13 @@ function Layout() {
       {isAuthPage ? (
         <AuthNavbar />
       ) : isFocusPage ? null : (
-        <Navbar isLoggedIn={isLoggedIn} />
+        <Navbar isLoggedIn={isLoggedIn} user={loggedUser} />
       )}
 
       <main className="flex-1 flex flex-col">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/focus" element={<FocusMode />} />
           <Route path="/peer-radar" element={<PeerRadar />} />

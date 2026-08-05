@@ -171,7 +171,8 @@ app.post(['/api/users/login', '/api/login'], async (req, res) => {
 // Get All Assignments
 app.get('/api/assignments', async (req, res) => {
   try {
-    const assignments = await Assignment.find().sort({ createdAt: -1 });
+    const filter = req.query.user ? { user: req.query.user } : {};
+    const assignments = await Assignment.find(filter).sort({ createdAt: -1 });
     res.json(assignments);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching assignments.' });

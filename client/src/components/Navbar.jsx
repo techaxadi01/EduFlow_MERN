@@ -1,13 +1,21 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-export default function Navbar({ isLoggedIn }) {
+export default function Navbar({ isLoggedIn, user }) {
+  const navigate = useNavigate();
+
   const scrollToTop = (e) => {
     // If already on home page, handle smooth scroll to top directly
     if (window.location.pathname === '/') {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('eduflow_token');
+    localStorage.removeItem('eduflow_logged_user');
+    navigate('/login');
   };
 
   return (
@@ -42,12 +50,21 @@ export default function Navbar({ isLoggedIn }) {
           {/* ACTION BUTTONS */}
           <div className="hidden md:flex gap-4">
             {isLoggedIn ? (
-              <Link
-                to="/dashboard"
-                className="px-5 py-2.5 rounded-xl bg-white text-emerald-600 font-bold hover:bg-emerald-50 hover:scale-105 shadow-md transition duration-200"
-              >
-                Dashboard
-              </Link>
+              <>
+                <Link
+                  to="/dashboard"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/20 text-white font-medium hover:bg-white/30 transition duration-200"
+                >
+                  <i className="fas fa-user-circle"></i>
+                  {user?.name} ({user?.role || 'Student'})
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="px-5 py-2.5 rounded-xl border border-white text-white font-semibold hover:bg-white/20 hover:scale-105 transition duration-200 cursor-pointer"
+                >
+                  Logout
+                </button>
+              </>
             ) : (
               <>
                 <Link

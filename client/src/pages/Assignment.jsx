@@ -25,19 +25,21 @@ function Assignment() {
     }
 
     setCurrentUser(loggedUser);
-    fetchAssignments();
+    fetchAssignments(loggedUser);
   }, [navigate]);
 
-  // READ Operation - Fetch from MongoDB Atlas API
-  const fetchAssignments = async () => {
+  // READ Operation - Fetch from MongoDB Atlas API (only logged-in user's assignments)
+  const fetchAssignments = async (user) => {
     try {
-      const response = await axios.get('/api/assignments');
+      const response = await axios.get('/api/assignments', {
+        params: { user: user?.name },
+      });
       setAssignments(response.data);
     } catch (error) {
       console.error('Error fetching assignments from MongoDB:', error);
       // Fallback local storage backup if backend server is offline
       const savedAssignments = JSON.parse(localStorage.getItem('eduflow_assignments')) || [];
-      setAssignments(savedAssignments);
+      setAssignments(savedAssignments.filter((item) => item.user === user?.name));
     }
   };
 
