@@ -44,11 +44,13 @@ function PeerRadar() {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  // Fetch all sessions from MongoDB Atlas
-  const fetchCampusSessions = async () => {
+  // Fetch all sessions from MongoDB Atlas, split into mine vs. everyone else's
+  const fetchSessions = async () => {
     try {
       const response = await axios.get('/api/sessions');
-      setCampusSessions(response.data);
+      const all = response.data;
+      setMySessions(all.filter((s) => s.name === loggedUser.name));
+      setCampusSessions(all.filter((s) => s.name !== loggedUser.name));
     } catch (error) {
       // Fallback mock data if backend server is offline
       setCampusSessions([
@@ -91,7 +93,7 @@ function PeerRadar() {
   };
 
   useEffect(() => {
-    fetchCampusSessions();
+    fetchSessions();
     getGPSLocation();
   }, []);
 
@@ -158,7 +160,7 @@ function PeerRadar() {
   };
 
   return (
-    <div className="bg-gradient-to-b from-white via-emerald-50/30 to-slate-50 min-h-screen flex-1 flex flex-col">
+    <div className="bg-radial from-white via-white to-emerald-50 flex-1 w-full flex flex-col">
     <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-12 flex flex-col gap-10 text-slate-800 font-sans">
       
       {/* Toast Notification */}
