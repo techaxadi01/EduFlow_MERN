@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 require('dotenv').config();
 
 const app = express();
@@ -18,18 +19,30 @@ app.use(express.urlencoded({ extended: true }));
 // ==========================================
 // ACTIVITY LOGGING (Node.js fs module)
 // ==========================================
-const LOG_DIR = path.join(__dirname, 'logs');
+// Vercel serverless functions have a read-only filesystem except /tmp,
+// so we write logs there when running on Vercel, and to a local folder
+// otherwise. If directory creation fails for any reason, logging is
+// disabled instead of crashing the server.
+const LOG_DIR = process.env.VERCEL ? path.join(os.tmpdir(), 'eduflow-logs') : path.join(__dirname, 'logs');
 const LOG_FILE = path.join(LOG_DIR, 'activity.log');
 
-if (!fs.existsSync(LOG_DIR)) {
-  fs.mkdirSync(LOG_DIR);
+let loggingEnabled = true;
+try {
+  if (!fs.existsSync(LOG_DIR)) {
+    fs.mkdirSync(LOG_DIR, { recursive: true });
+  }
+} catch (err) {
+  console.error('Could not initialize log directory, disabling file logging:', err.message);
+  loggingEnabled = false;
 }
 
 app.use((req, res, next) => {
-  const entry = `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}\n`;
-  fs.appendFile(LOG_FILE, entry, (err) => {
-    if (err) console.error('Log write error:', err);
-  });
+  if (loggingEnabled) {
+    const entry = `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}\n`;
+    fs.appendFile(LOG_FILE, entry, (err) => {
+      if (err) console.error('Log write error:', err);
+    });
+  }
   next();
 });
 
