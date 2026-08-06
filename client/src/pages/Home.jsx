@@ -89,7 +89,7 @@ function Home() {
                     <h3 className="font-semibold mt-4 text-slate-800">Focus Mode</h3>
                   </Link>
 
-                  <Link to="/dashboard" className="block bg-slate-50 rounded-2xl p-6 text-center shadow border border-transparent hover:border-emerald-400 hover:scale-105 transition duration-300">
+                  <Link to="/assignment" className="block bg-slate-50 rounded-2xl p-6 text-center shadow border border-transparent hover:border-emerald-400 hover:scale-105 transition duration-300">
                     <i className="fas fa-list-check text-4xl text-red-500"></i>
                     <h3 className="font-semibold mt-4 text-slate-800">Assignments</h3>
                   </Link>
@@ -130,7 +130,7 @@ function Home() {
               <p className="mt-2 text-gray-600">Study with all the Distractions Blocked.</p>
             </div>
 
-            <div onClick={() => handleCardClick('/dashboard')} className="utility-card bg-white hover:bg-emerald-50/50 hover:border-emerald-400 hover:scale-105 hover:shadow-lg rounded-xl shadow border border-slate-100 p-6 text-center transition-all duration-300 cursor-pointer">
+            <div onClick={() => handleCardClick('/assignment')} className="utility-card bg-white hover:bg-emerald-50/50 hover:border-emerald-400 hover:scale-105 hover:shadow-lg rounded-xl shadow border border-slate-100 p-6 text-center transition-all duration-300 cursor-pointer">
               <i className="fas fa-list-check text-4xl text-blue-500"></i>
               <h3 className="font-semibold mt-4">Assignment Tracker</h3>
               <p className="mt-2 text-gray-600">Track deadlines and receive smart reminders.</p>

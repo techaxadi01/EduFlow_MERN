@@ -21,7 +21,7 @@ function FocusMode() {
   // Fetch Focus Stats from MongoDB on Load
   useEffect(() => {
     const fetchStats = async () => {
-      const token = localStorage.getItem('eduflow_token');
+      const token = sessionStorage.getItem('eduflow_token');
       if (!token) return;
 
       try {
@@ -69,7 +69,7 @@ function FocusMode() {
       triggerNotification('Focus Complete!', 'Time to step away and take your break.');
 
       // Log Session to Database
-      const token = localStorage.getItem('eduflow_token');
+      const token = sessionStorage.getItem('eduflow_token');
       if (token) {
         try {
           await axios.post(

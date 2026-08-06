@@ -13,8 +13,8 @@ export default function Navbar({ isLoggedIn, user }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('eduflow_token');
-    localStorage.removeItem('eduflow_logged_user');
+    sessionStorage.removeItem('eduflow_token');
+    sessionStorage.removeItem('eduflow_logged_user');
     navigate('/login');
   };
 
@@ -23,8 +23,8 @@ export default function Navbar({ isLoggedIn, user }) {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex justify-between items-center h-20">
           
-          {/* LOGO: Navigates to /dashboard if logged in, otherwise / */}
-          <Link to={isLoggedIn ? "/dashboard" : "/"} className="flex items-center gap-3">
+          {/* LOGO */}
+          <Link to="/" className="flex items-center gap-3">
             <span className="text-3xl font-bold text-white flex items-center gap-2">
               <i className="fas fa-graduation-cap text-2xl"></i> EduFlow
             </span>
@@ -52,7 +52,7 @@ export default function Navbar({ isLoggedIn, user }) {
             {isLoggedIn ? (
               <>
                 <Link
-                  to="/dashboard"
+                  to="/"
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/20 text-white font-medium hover:bg-white/30 transition duration-200"
                 >
                   <i className="fas fa-user-circle"></i>

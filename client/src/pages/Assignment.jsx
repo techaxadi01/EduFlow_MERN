@@ -15,8 +15,8 @@ function Assignment() {
 
   // AUTH GUARD & INITIAL DATA FETCH
   useEffect(() => {
-    const token = localStorage.getItem('eduflow_token');
-    const loggedUser = JSON.parse(localStorage.getItem('eduflow_logged_user'));
+    const token = sessionStorage.getItem('eduflow_token');
+    const loggedUser = JSON.parse(sessionStorage.getItem('eduflow_logged_user'));
 
     // Check if user is logged in
     if (!token || !loggedUser) {
@@ -38,7 +38,7 @@ function Assignment() {
     } catch (error) {
       console.error('Error fetching assignments from MongoDB:', error);
       // Fallback local storage backup if backend server is offline
-      const savedAssignments = JSON.parse(localStorage.getItem('eduflow_assignments')) || [];
+      const savedAssignments = JSON.parse(sessionStorage.getItem('eduflow_assignments')) || [];
       setAssignments(savedAssignments.filter((item) => item.user === user?.name));
     }
   };
@@ -64,7 +64,7 @@ function Assignment() {
           item.id === editingId || item._id === editingId ? { ...item, title, subject, dueDate } : item
         );
         setAssignments(updatedList);
-        localStorage.setItem('eduflow_assignments', JSON.stringify(updatedList));
+        sessionStorage.setItem('eduflow_assignments', JSON.stringify(updatedList));
       }
       setEditingId(null);
     } else {
@@ -85,7 +85,7 @@ function Assignment() {
         const localItem = { ...newAssignment, id: Date.now() };
         const updatedList = [localItem, ...assignments];
         setAssignments(updatedList);
-        localStorage.setItem('eduflow_assignments', JSON.stringify(updatedList));
+        sessionStorage.setItem('eduflow_assignments', JSON.stringify(updatedList));
       }
     }
 
@@ -111,7 +111,7 @@ function Assignment() {
     } catch (error) {
       const filteredList = assignments.filter((item) => item.id !== id && item._id !== id);
       setAssignments(filteredList);
-      localStorage.setItem('eduflow_assignments', JSON.stringify(filteredList));
+      sessionStorage.setItem('eduflow_assignments', JSON.stringify(filteredList));
     }
   };
 
@@ -128,37 +128,19 @@ function Assignment() {
         (a.id === id || a._id === id) ? { ...a, status: newStatus } : a
       );
       setAssignments(updatedList);
-      localStorage.setItem('eduflow_assignments', JSON.stringify(updatedList));
+      sessionStorage.setItem('eduflow_assignments', JSON.stringify(updatedList));
     }
   };
 
   // LOGOUT Handler
   const handleLogout = () => {
-    localStorage.removeItem('eduflow_token');
-    localStorage.removeItem('eduflow_logged_user');
+    sessionStorage.removeItem('eduflow_token');
+    sessionStorage.removeItem('eduflow_logged_user');
     navigate('/login');
   };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800">
-      {/* Top Navbar */}
-      <nav className="bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 text-white shadow-lg py-4 px-8 flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold flex items-center gap-2">
-          <i className="fas fa-graduation-cap"></i> EduFlow Dashboard
-        </Link>
-        <div className="flex items-center gap-4">
-          <span className="font-medium bg-white/20 px-4 py-1.5 rounded-full text-sm">
-            👤 {currentUser?.name} ({currentUser?.role || 'Student'})
-          </span>
-          <button
-            onClick={handleLogout}
-            className="bg-white text-emerald-700 px-4 py-1.5 rounded-xl text-sm font-semibold hover:bg-emerald-50 transition cursor-pointer"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
-
       <div className="max-w-6xl mx-auto p-6 space-y-8">
         {/* Module Header */}
         <div className="text-center">

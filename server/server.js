@@ -4,6 +4,8 @@ dns.setServers(['1.1.1.1', '8.8.8.8']); // DNS fix for MongoDB SRV lookups
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -12,6 +14,24 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ==========================================
+// ACTIVITY LOGGING (Node.js fs module)
+// ==========================================
+const LOG_DIR = path.join(__dirname, 'logs');
+const LOG_FILE = path.join(LOG_DIR, 'activity.log');
+
+if (!fs.existsSync(LOG_DIR)) {
+  fs.mkdirSync(LOG_DIR);
+}
+
+app.use((req, res, next) => {
+  const entry = `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}\n`;
+  fs.appendFile(LOG_FILE, entry, (err) => {
+    if (err) console.error('Log write error:', err);
+  });
+  next();
+});
 
 // MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI;

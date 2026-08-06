@@ -28,11 +28,11 @@ function PeerRadar() {
   const [showToast, setShowToast] = useState(false);
 
   // Retrieve current user
-  const loggedUser = JSON.parse(localStorage.getItem('eduflow_logged_user')) || { name: 'Anonymous Student' };
+  const loggedUser = JSON.parse(sessionStorage.getItem('eduflow_logged_user')) || { name: 'Anonymous Student' };
 
   // AUTH PROTECTION CHECK
   useEffect(() => {
-    const token = localStorage.getItem('eduflow_token');
+    const token = sessionStorage.getItem('eduflow_token');
     if (!token) {
       navigate('/login');
     }

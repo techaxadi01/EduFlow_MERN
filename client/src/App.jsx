@@ -10,25 +10,26 @@ import Register from './pages/Register';
 import FocusMode from './pages/FocusMode';
 import PeerRadar from './pages/PeerRadar';
 import Assignment from './pages/Assignment';
-import Dashboard from './pages/Dashboard';
+import WelcomeBack from './pages/WelcomeBack';
 
 function Layout() {
   const location = useLocation();
-  // Derived directly from localStorage so it stays in sync with login/logout
+  // Derived directly from sessionStorage so it stays in sync with login/logout
   // without needing every page to manually update shared state.
-  const isLoggedIn = !!localStorage.getItem('eduflow_token');
-  const loggedUser = JSON.parse(localStorage.getItem('eduflow_logged_user') || 'null');
+  const isLoggedIn = !!sessionStorage.getItem('eduflow_token');
+  const loggedUser = JSON.parse(sessionStorage.getItem('eduflow_logged_user') || 'null');
 
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
   const isFocusPage = location.pathname === '/focus';
-  const isRichFooterPage = location.pathname === '/' || location.pathname === '/dashboard';
+  const isWelcomePage = location.pathname === '/welcome';
+  const isRichFooterPage = location.pathname === '/';
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col font-sans">
       {/* Dynamic Navbar Selection */}
       {isAuthPage ? (
         <AuthNavbar />
-      ) : isFocusPage ? null : (
+      ) : isFocusPage || isWelcomePage ? null : (
         <Navbar isLoggedIn={isLoggedIn} user={loggedUser} />
       )}
 
@@ -40,12 +41,12 @@ function Layout() {
           <Route path="/focus" element={<FocusMode />} />
           <Route path="/peer-radar" element={<PeerRadar />} />
           <Route path="/assignment" element={<Assignment />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/welcome" element={<WelcomeBack />} />
         </Routes>
       </main>
 
       {/* Conditional Footer logic */}
-      {isFocusPage ? null : isRichFooterPage ? <Footer /> : <SimpleFooter />}
+      {isFocusPage || isWelcomePage ? null : isRichFooterPage ? <Footer /> : <SimpleFooter />}
     </div>
   );
 }

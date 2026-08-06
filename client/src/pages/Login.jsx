@@ -21,15 +21,15 @@ function Login() {
       const user = response.data.user;
       const token = response.data.token;
 
-      localStorage.setItem('eduflow_token', token);
-      localStorage.setItem('eduflow_logged_user', JSON.stringify(user));
+      sessionStorage.setItem('eduflow_token', token);
+      sessionStorage.setItem('eduflow_logged_user', JSON.stringify(user));
 
       setMessage({ text: `Welcome back, ${user.name}! Redirecting...`, isError: false });
       setIdentifier('');
       setPassword('');
 
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/welcome');
       }, 1200);
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Invalid username/email or password.';
