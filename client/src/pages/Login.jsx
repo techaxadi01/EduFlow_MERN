@@ -30,7 +30,7 @@ function Login() {
 
       setTimeout(() => {
         navigate('/welcome');
-      }, 1200);
+      }, 500);
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Invalid username/email or password.';
       setMessage({ text: errorMessage, isError: true });
