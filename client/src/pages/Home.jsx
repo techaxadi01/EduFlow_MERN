@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 function Home() {
   const navigate = useNavigate();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const isLoggedIn = !!sessionStorage.getItem('eduflow_token');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,9 +70,11 @@ function Home() {
                 <a href="#utility" className="bg-emerald-500 text-white px-6 py-3 rounded-xl shadow-lg hover:bg-teal-600 hover:scale-105 transition">
                   Explore Resources
                 </a>
-                <Link to="/register" className="bg-white border border-emerald-500 text-emerald-600 px-6 py-3 rounded-xl hover:bg-slate-200 hover:border-emerald-600 hover:scale-105 transition">
-                  Get Started
-                </Link>
+                {!isLoggedIn && (
+                  <Link to="/register" className="bg-white border border-emerald-500 text-emerald-600 px-6 py-3 rounded-xl hover:bg-slate-200 hover:border-emerald-600 hover:scale-105 transition">
+                    Get Started
+                  </Link>
+                )}
               </div>
             </div>
 

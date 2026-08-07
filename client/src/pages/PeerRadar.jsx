@@ -44,13 +44,30 @@ function PeerRadar() {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  // Fetch all sessions from MongoDB Atlas, split into mine vs. everyone else's
+  // Returns minutes until this session's start time, relative to right now
+  // (wraps to "tomorrow" for times already passed today), so sessions
+  // starting soonest from the current moment sort first.
+  const minutesUntil = (startTime) => {
+    if (!startTime) return Infinity;
+    const [h, m] = startTime.split(':').map(Number);
+    if (Number.isNaN(h) || Number.isNaN(m)) return Infinity;
+    const sessionMinutes = h * 60 + m;
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    return (sessionMinutes - currentMinutes + 1440) % 1440;
+  };
+
+  const sortByUpcoming = (list) =>
+    [...list].sort((a, b) => minutesUntil(a.startTime) - minutesUntil(b.startTime));
+
+  // Fetch all sessions from MongoDB Atlas, split into mine vs. everyone else's,
+  // matched by username (unique) rather than display name (which can repeat).
   const fetchSessions = async () => {
     try {
       const response = await axios.get('/api/sessions');
       const all = response.data;
-      setMySessions(all.filter((s) => s.name === loggedUser.name));
-      setCampusSessions(all.filter((s) => s.name !== loggedUser.name));
+      setMySessions(sortByUpcoming(all.filter((s) => s.username === loggedUser.username)));
+      setCampusSessions(sortByUpcoming(all.filter((s) => s.username !== loggedUser.username)));
     } catch (error) {
       // Fallback mock data if backend server is offline
       setCampusSessions([
@@ -109,9 +126,11 @@ function PeerRadar() {
     const timeWindow = `${timeFrom} - ${timeTo}`;
     const newSession = {
       name: loggedUser.name,
+      username: loggedUser.username,
       subject,
       locationName,
       timeWindow,
+      startTime: timeFrom,
       lat,
       lng,
       createdAt: new Date(),
@@ -120,9 +139,9 @@ function PeerRadar() {
     try {
       const response = await axios.post('/api/sessions', newSession);
       const savedSession = response.data;
-      setMySessions([savedSession, ...mySessions]);
+      setMySessions(sortByUpcoming([savedSession, ...mySessions]));
     } catch (error) {
-      setMySessions([{ ...newSession, _id: Date.now() }, ...mySessions]);
+      setMySessions(sortByUpcoming([{ ...newSession, _id: Date.now() }, ...mySessions]));
     }
 
     triggerToast('Session Added Successfully!');

@@ -14,7 +14,7 @@ function WelcomeBack() {
 
     const timer = setTimeout(() => {
       navigate('/');
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [navigate]);

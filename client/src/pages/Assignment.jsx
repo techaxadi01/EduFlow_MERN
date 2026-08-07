@@ -32,14 +32,14 @@ function Assignment() {
   const fetchAssignments = async (user) => {
     try {
       const response = await axios.get('/api/assignments', {
-        params: { user: user?.name },
+        params: { username: user?.username },
       });
       setAssignments(response.data);
     } catch (error) {
       console.error('Error fetching assignments from MongoDB:', error);
       // Fallback local storage backup if backend server is offline
       const savedAssignments = JSON.parse(sessionStorage.getItem('eduflow_assignments')) || [];
-      setAssignments(savedAssignments.filter((item) => item.user === user?.name));
+      setAssignments(savedAssignments.filter((item) => item.username === user?.username));
     }
   };
 
@@ -74,7 +74,7 @@ function Assignment() {
         subject,
         dueDate,
         status: 'Pending',
-        user: currentUser?.name || 'Anonymous',
+        username: currentUser?.username || 'anonymous',
       };
 
       try {

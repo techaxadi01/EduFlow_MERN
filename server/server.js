@@ -73,13 +73,15 @@ const userSchema = new mongoose.Schema(
 const User = mongoose.model('User', userSchema);
 
 // Assignment Schema
+// NOTE: identifies the owner by `username` (unique) instead of display name,
+// since two users can share the same display name.
 const assignmentSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     subject: { type: String, required: true },
     dueDate: { type: String, required: true },
     status: { type: String, default: 'Pending' },
-    user: { type: String, default: 'Anonymous' },
+    username: { type: String, default: 'anonymous' },
   },
   { timestamps: true }
 );
@@ -87,12 +89,17 @@ const assignmentSchema = new mongoose.Schema(
 const Assignment = mongoose.model('Assignment', assignmentSchema);
 
 // Peer Radar Session Schema
+// `username` uniquely identifies the owner (for "Your Active Sessions" matching).
+// `name` is the display name shown to peers on the Campus Sessions grid.
+// `startTime` ("HH:MM", 24-hour) is used to sort sessions relative to now.
 const sessionSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    username: { type: String, required: true },
     subject: { type: String, required: true },
     locationName: { type: String, required: true },
     timeWindow: { type: String, required: true },
+    startTime: { type: String, default: '00:00' },
     lat: { type: Number, required: true },
     lng: { type: Number, required: true },
   },
@@ -204,7 +211,7 @@ app.post(['/api/users/login', '/api/login'], async (req, res) => {
 // Get All Assignments
 app.get('/api/assignments', async (req, res) => {
   try {
-    const filter = req.query.user ? { user: req.query.user } : {};
+    const filter = req.query.username ? { username: req.query.username } : {};
     const assignments = await Assignment.find(filter).sort({ createdAt: -1 });
     res.json(assignments);
   } catch (err) {
